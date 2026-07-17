@@ -1,0 +1,36 @@
+Audio file in -> japanese text -> romanji
+30 min of Jap audio with correct transcripts
+
+ASR eval set
+Download 200 Japanese Audio clips with correct transcriptions
+Write numbers, get baseline
+
+Write 200 Japanese sentences with tricky kanji, and write down correct pronunciation
+Check script, write numbers, get baseline
+
+live
+Mic -> ring buffer -> VAD -> Whisper -> LocalAgreement
+Swap pykakasi -> something more accurate (MeCab + UniDic)
+
+find goldilocks
+Small chunk of text -> faster response to Whisper, but more wrong
+Big chunk -> accurate but slow
+
+Plot graph to find best tradeoff
+
+Setup for venv
+
+Use python 3.12
+py -3.12 -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install faster-whisper pykakasi jiwer sounddevice pandas
+
+Use cuda for gpu processing
+python -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
+
+____
+
+Whisper Model
+OpenAI model that takes Japanese then writes in kanji
+faster-whisper is just repackaged whisper thats faster
+
