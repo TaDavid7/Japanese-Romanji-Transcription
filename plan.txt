@@ -34,3 +34,5 @@ Whisper Model
 OpenAI model that takes Japanese then writes in kanji
 faster-whisper is just repackaged whisper thats faster
 
+Cant just output kana because of homophones
+
