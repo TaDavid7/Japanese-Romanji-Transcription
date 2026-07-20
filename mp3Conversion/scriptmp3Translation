@@ -1,0 +1,16 @@
+import cuda_setup
+from faster_whisper import WhisperModel # speech to text model
+import pykakasi # Japanese -> romanji converter
+
+
+model = WhisperModel("large-v3", device="cuda", compute_type="float16") #loads big Wisper onto GPU
+
+kks = pykakasi.kakasi() #sets up converter object
+def transcribe(path): #function to run whispher on audio file.
+    segments, _ = model.transcribe(path, language="ja") #returns one string segments, and throwaway metadata _
+    text = "".join(s.text for s in segments) #join array to one string
+    romaji = " ".join(item["hepburn"] for item in kks.convert(text)) #breaks the sentence from Japanese to romanji
+    return text, romaji #return Japanese and romanji
+
+if __name__ == "__main__":
+    print(transcribe("test.mp3")) #print results

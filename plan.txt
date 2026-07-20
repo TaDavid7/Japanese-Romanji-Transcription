@@ -5,6 +5,11 @@ ASR eval set
 Download 200 Japanese Audio clips with correct transcriptions
 Write numbers, get baseline
 
+https://mozilladatacollective.com/organization/cmfh0j9o10006ns07jq45h7xk
+Used this for examples
+
+
+
 Write 200 Japanese sentences with tricky kanji, and write down correct pronunciation
 Check script, write numbers, get baseline
 
@@ -37,3 +42,23 @@ faster-whisper is just repackaged whisper thats faster
 
 Cant just output kana because of homophones
 
+_____
+First score (decrease Audio -> Japanese Text Error)
+5 clips: CER = 0.355
+200 clips: CER = 0.425
+(Need to fix formatting mismatch)
+CER = 0.399
+(problem based on kanji vs kana, digits vs kanji, formaating difference)
+
+2 ways to decrease error
+1. Converting kana (to romanji) so 私 and わたし are scored the same
+2. Lowering actual error with helping the model
+(After doing 1 the error) is down to 
+CER = 0.362
+
+(Turn on VAD to filter out hallucination)
+CER = 0.203
+
+
+
+Handwritten (decrease Japanese text -> romanji error)
