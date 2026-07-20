@@ -17,6 +17,7 @@ Small chunk of text -> faster response to Whisper, but more wrong
 Big chunk -> accurate but slow
 
 Plot graph to find best tradeoff
+_____
 
 Setup for venv
 
