@@ -58,7 +58,26 @@ CER = 0.362
 
 (Turn on VAD to filter out hallucination)
 CER = 0.203
-
-
+(Can go back and lower this more)
 
 Handwritten (decrease Japanese text -> romanji error)
+pykakasi reading accuracy: 0.650  (13/20)
+MeCab reading accuracy: 0.750  (15/20)
+
+5 cases of what MeCab missed
+MISS  一日   got:ついたち  want:いちにち  (朝の一日一善)        not enough context
+MISS  人気   got:にんき  want:ひとけ  (夜道は人気がなくて怖い)      undeterminable, might need audio reference
+MISS  市場   got:しじょう  want:いちば  (市場で野菜を買う)      not enouch context
+MISS  方    got:ほう  want:かた  (あの方はどなたですか)     grammar
+MISS  一冊   got:いちさつ  want:いっさつ  (本を一冊読んだ)      combined word, grammar of measured words
+
+
+To fix the "audio reference" we can set up an audio reference
+audio -> Whispher -> kanji -> Mecab -> romanji (primary)
+audio -> Wishper -> kana -> romanji (reference) *we can't just rely on this as we still want kanji for contexual meaning (as romanji can represent many different meanings) and
+this route of the model has a lower accuracy
+for each word:
+    if the 2 readings disagree AND the known homograph is listed as a potential pronounciation of the kanji reading
+        trust the kana
+    else
+        keep Mecab
