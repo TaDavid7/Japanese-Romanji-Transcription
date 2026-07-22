@@ -22,7 +22,7 @@ Small chunk of text -> faster response to Whisper, but more wrong
 Big chunk -> accurate but slow
 
 Plot graph to find best tradeoff
-_____
+________
 
 Setup for venv
 
@@ -34,7 +34,7 @@ pip install faster-whisper pykakasi jiwer sounddevice pandas
 Use cuda for gpu processing
 python -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
 
-____
+________
 
 Whisper Model
 OpenAI model that takes Japanese then writes in kanji
@@ -42,7 +42,7 @@ faster-whisper is just repackaged whisper thats faster
 
 Cant just output kana because of homophones
 
-_____
+________
 First score (decrease Audio -> Japanese Text Error)
 5 clips: CER = 0.355
 200 clips: CER = 0.425
@@ -74,10 +74,17 @@ MISS  一冊   got:いちさつ  want:いっさつ  (本を一冊読んだ)     
 
 To fix the "audio reference" we can set up an audio reference
 audio -> Whispher -> kanji -> Mecab -> romanji (primary)
-audio -> Wishper -> kana -> romanji (reference) *we can't just rely on this as we still want kanji for contexual meaning (as romanji can represent many different meanings) and
+audio -> Wishper -> kana -> romanji (reference) 
+*we can't just rely on this as we still want kanji for contexual meaning (as romanji can represent many different meanings) and
 this route of the model has a lower accuracy
 for each word:
     if the 2 readings disagree AND the known homograph is listed as a potential pronounciation of the kanji reading
         trust the kana
     else
         keep Mecab
+
+There are 4 different ways to approach different model for jap audio to kana
+1. Wispher to kana (suggested)
+2. ReazonSpeech
+3. ESPnet kana model
+4. Julius / Kaldi (potentially powerful but long to setup)
