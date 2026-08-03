@@ -9,13 +9,14 @@ def _get_jam():
     if _jam is None:
         from jamdict import Jamdict
         _jam = Jamdict()
+        _jam.lookup("行く")   # fail if db is missing
     return _jam
 
 #Lookup
 @lru_cache(maxsize=4096) # look up 人気 once, the answer's cached, ask again it's instant. maxsize=4096 = remember up to 4096 words
 #readings_of("人気")   not seen before → do the work, store the answer
 #readings_of("人気")   seen it → return stored answer instantly
-def readings_of(word, common_only=False):
+def readings_of(word):
     try:
         result = _get_jam().lookup(word)
     except Exception:

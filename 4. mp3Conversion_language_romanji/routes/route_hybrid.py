@@ -12,15 +12,27 @@ import fugashi, jaconv
 from route_kanji import PARTICLE_SOUND
 from route_kana import transcribe_kana
 from homographs import reading_lookup
+import re
+KANJI = re.compile(r"[\u4e00-\u9fff]")
+
 
 tagger = fugashi.Tagger()
+def _skel(s):
+    return s.replace("っ", "").replace("ー", "")
 
 def resolve_word(surface, mecab_kana, kana_ref, lookup=reading_lookup):
-    valid = lookup(surface) #get readings of word
+    # only kanji-bearing tokens can have reading ambiguity worth fixing
+    if not KANJI.search(surface):
+        return mecab_kana
+    if len(surface) < 2:
+        return mecab_kana
+    valid = lookup(surface)
     if not valid:
         return mecab_kana
-    for alt in valid - {mecab_kana}: #readings that Mecab didn't pick
-        if alt in kana_ref:
+    for alt in valid - {mecab_kana}:
+        if _skel(alt) in _skel(mecab_kana) or _skel(mecab_kana) in _skel(alt):
+            continue
+        if len(alt) >= 3 and alt in kana_ref:
             return alt
     return mecab_kana
     
@@ -41,3 +53,4 @@ def transcribe(path, lookup=reading_lookup):
         parts.append(resolve_word(surface, mecab_kana, kana_ref, lookup))
     kana_sentence = "".join(parts)
     return jaconv.kana2alphabet(kana_sentence)
+

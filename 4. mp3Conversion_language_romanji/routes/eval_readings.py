@@ -114,7 +114,7 @@ def main():
               else f"{col:<14}{'n/a':<16}{n}")
     print("=" * 46)
 
-    # how often did the override actually fire?
+    # how often did the override actually fire
     changed = (out["hybrid"] != out["mecab_only"]).sum()
     print(f"\nhybrid differed from mecab-only on {changed}/{len(out)} clips")
     if changed:

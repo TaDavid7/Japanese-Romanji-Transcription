@@ -1,12 +1,5 @@
-Audio file in -> japanese text -> romanji
-30 min of Jap audio with correct transcripts
-
-ASR eval set
-Download 200 Japanese Audio clips with correct transcriptions
-Write numbers, get baseline
-
 https://mozilladatacollective.com/organization/cmfh0j9o10006ns07jq45h7xk
-Used this for examples
+Used this for examples under revision 2
 
 
 
@@ -88,3 +81,106 @@ There are 4 different ways to approach different model for jap audio to kana
 2. ReazonSpeech
 3. ESPnet kana model
 4. Julius / Kaldi (potentially powerful but long to setup)
+
+To test further which route is best (kanji, kana, hybrid), I will use JSUT dataset to test more
+Annotations : git clone https://github.com/sarulab-speech/jsut-label.git
+Audio/Folder:
+wget http://ss-takashi.sakura.ne.jp/corpus/jsut_ver1.1.zip
+unzip jsut_ver1.1.zip
+Only focusing on the basic 5000 folder
+(note just kanji in the zip 5000 folder, so clone is necessary for kana)
+
+When running eval_jsut (look at comments for more details), this was result
+route         avg similarity  n
+----------------------------------------------
+kanji         0.942           200
+kana          0.866           200
+hybrid        0.942           200
+
+Either clips didnt have any homophones or the hybrid didnt ran
+Seems like Jamdict-data with pip not being installed caused this issue
+AI reccomends this for workaround
+
+# 1. download the sdist without installing
+mkdir C:\temp\jd -Force
+cd C:\temp\jd
+python -c "import urllib.request as u, json; d=json.load(u.urlopen('https://pypi.org/pypi/jamdict-data/1.5/json')); url=[f['url'] for f in d['urls'] if f['filename'].endswith('.tar.gz')][0]; u.urlretrieve(url, 'jamdict_data-1.5.tar.gz'); print('downloaded')"
+
+# 2. extract it
+tar -xf jamdict_data-1.5.tar.gz
+cd jamdict_data-1.5\jamdict_data
+
+# 3. decompress the db (this is the step their installer fumbles)
+python -c "import lzma, shutil; shutil.copyfileobj(lzma.open('jamdict.db.xz'), open('jamdict.db','wb')); print('decompressed')"
+
+# 4. put it where jamdict looks by default
+mkdir $env:USERPROFILE\.jamdict\data -Force
+copy jamdict.db $env:USERPROFILE\.jamdict\data\jamdict.db
+
+Fixed up romanization convention to bring up accuracy but now can see that the hybrid route is harmful
+==============================================
+route         avg similarity  n
+----------------------------------------------
+kanji         0.977           200
+kana          0.884           200
+hybrid        0.929           200
+==============================================
+
+kanji == hybrid on 64/200 clips
+
+Issues why hybrid is worse
+Single-mora substitutions dominate. 水 → み (0001), 日 → か (0002), 部 → ふ (0013), が → え (0007). The len(alt) >= 3 guard is clearly not in effect
+Sokuon corruption. 0012 oborekakaxtsutte, 0017 sawaxtsutte, 0015 etaxtsutte. MeCab is emitting っ as its own token, jamdict returns a reading for it, and the substituted form romanizes as xtsu
+It does sometimes work. 0011 fixed 木曾川/日本/ライン川 (kisogawa, nihon, raingawa — all correct vs kanji's wrong kisokawa/nippon). 0016 fixed 出生率 → shussee
+
+This seems to fix it (50 clips)
+==============================================
+route         avg similarity  n
+----------------------------------------------
+kanji         0.971           50
+kana          0.866           50
+hybrid        0.973           50
+==============================================
+
+The kana does seem to be inaccurate which could hurt hybrid route a bit, might need a better model
+For now, run 500 clips to see a more consistent result
+==============================================
+route         avg similarity  n
+----------------------------------------------
+kanji         0.978           500
+kana          0.878           500
+hybrid        0.978           500
+==============================================
+
+kanji == hybrid on 487/500 clips
+Looks like hybrid doesnt hurt but doesnt really help that much either
+Wins:
+
+0011 日本 nippon→nihon
+0016 出生率 shusshoo→shussee
+0037 日本 nippon→nihon
+0077 闇夜 anya→yamiyo
+0253 換算 kansan→kanzan
+0342 早急 sakkyuu→sookyuu
+0364 瞬く shibatataku→matataku
+
+Losses and all same bug
+
+0010 hontoo→honto
+0116 kakkooo→kakkoo
+0186 kesshite→keshite
+0335 akanboo→akanbo
+0375 akanboo→akanbo
+0330 shitatenin→shitateeen
+
+1 line fix to long-vowel or shortening (orthographic variant)
+
+Run 500 clips again
+==============================================
+route         avg similarity  n
+----------------------------------------------
+kanji         0.978           500
+kana          0.878           500
+hybrid        0.978           500
+==============================================
+This time the hybrid fixed 7 and after skel fix should be 8 wins, 1 loss
