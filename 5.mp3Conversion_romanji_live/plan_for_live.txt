@@ -1,0 +1,6 @@
+1. Ring buffer - mic callback to safely dump samples into safe queues, growing buffer
+2. VAD - decide when someone is talking
+3. Whisper - retranscribe the growing buffer every 1s
+4. LocalAgreement 2- for disagreements/flickers, run Whisper repeatedly and commit text that stayed same across two runs
+
+Use existing MeCab -> romanji logic
