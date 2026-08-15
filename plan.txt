@@ -184,3 +184,5 @@ kana          0.878           500
 hybrid        0.978           500
 ==============================================
 This time the hybrid fixed 7 and after skel fix should be 8 wins, 1 loss
+
+Need a better kana route and more homographs data
