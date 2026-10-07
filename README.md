@@ -1,18 +1,16 @@
 # Japanese Speech → Rōmaji Transcription
-
+(Note: Used AI to help write code and readme)
 Turns Japanese audio into **rōmaji** (Latin-script pronunciation), from both audio files and
 a live microphone stream.
 
-The hard part isn't the speech recognition — it's the last step. Japanese text doesn't tell you
-how it's pronounced. This project builds and benchmarks three different pipelines for that step,
-then ships the winner as a real-time transcriber.
+Main problem encountered
 
 ```
 市場で野菜を買う   →   ichiba de yasai o kau      ("marketplace")
 市場が動く         →   shijou ga ugoku            ("financial market")
 ```
 
-Same kanji, two readings. Picking the right one is the whole problem.
+Same kanji, 2 readings
 
 ---
 
@@ -44,9 +42,7 @@ Prompting Whisper to emit hiragana works, but it throws away the kanji that disa
 
 **3. Scoring is a trap.**
 Comparing `私` against `わたし` as raw text scores as a total miss even though the pronunciation
-is identical. Character Error Rate on kanji text measures the wrong thing — you have to
-normalize both sides to a phonetic representation before scoring, or your metric punishes
-correct answers.
+is identical. Character Error Rate on kanji text measures the wrong thing
 
 ## Architecture
 
